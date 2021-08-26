@@ -1,0 +1,8 @@
+Codigo de vista creada utilizando el lenguaje SQL para la parte 1
+
+
+
+CREATE VIEW parte11 AS
+SELECT RT_ID,MIN(SN) SN_B,STOP_CD STOP_CD_B,MAX(SN) SN_E,IF(SN=MAX(SN),'1',STOP_CD) STOP_CD_E,MAX(DIST) DIST,IF(SN=MAX(SN),'',LMT_SPD) LMT_SPD
+FROM parte1
+GROUP BY RT_ID

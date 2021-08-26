@@ -1,0 +1,70 @@
+Parte 2:
+Mediante la informacion suministrada se crean las vistas del dia 26. Con esta información se crearon vistas con SQL que dan solucion a las preguntas.
+
+
+
+
+⦁	¿Cuántas transacciones se realizan por cada hora? (mostrar las 24 horas)
+
+CREATE VIEW parte21 AS
+SELECT HOUR (STR_TO_DATE(FechaTransaccion, '%m/%d/%Y%H:%i')) HORA,DAY(STR_TO_DATE(FechaTransaccion, '%m/%d/%Y%H:%i'))='22' DIA, COUNT(*) FROM parte2
+WHERE DAY(STR_TO_DATE(FechaTransaccion, '%m/%d/%Y%H:%i'))='26'
+GROUP BY HOUR(STR_TO_DATE(FechaTransaccion, '%m/%d/%Y%H:%i'))
+
+
+⦁	¿Cuántos pasajeros se movilizaron por cada hora?
+
+CREATE VIEW parte22 AS
+SELECT HOUR (STR_TO_DATE(FechaTransaccion, '%m/%d/%Y%H:%i')) HORA , COUNT(*) TotalPasajeros FROM parte2
+WHERE DAY(STR_TO_DATE(FechaTransaccion, '%m/%d/%Y%H:%i'))='26' and CodigoTransaccion='19'
+GROUP BY HOUR(STR_TO_DATE(FechaTransaccion, '%m/%d/%Y%H:%i'))
+
+
+⦁	¿Cuántos buses operaron por cada hora?
+
+CREATE VIEW parte23 AS
+SELECT HOUR (STR_TO_DATE(FechaTransaccion, '%m/%d/%Y%H:%i')) Hora, COUNT(DISTINCT (Bus)) totalDeBuses FROM parte2 
+WHERE DAY(STR_TO_DATE(FechaTransaccion, '%m/%d/%Y%H:%i'))='26'
+GROUP BY   HOUR(STR_TO_DATE(FechaTransaccion, '%m/%d/%Y%H:%i'))
+
+
+⦁	¿Cuáles son los 30 buses que más pasajeros transportaron?
+
+CREATE VIEW parte24 AS
+SELECT  bus, COUNT(bus) FROM parte2
+WHERE DAY(STR_TO_DATE(FechaTransaccion, '%m/%d/%Y%H:%i'))='26'
+GROUP BY Bus
+ORDER by COUNT(bus) DESC
+LIMIT 30
+
+
+⦁	¿Cuál fue el promedio de ingresos por hora?
+
+CREATE VIEW parte25 AS
+SELECT  HOUR (STR_TO_DATE(FechaTransaccion, '%m/%d/%Y%H:%i')) Hora, round((SUM(TarifaMonto)/TotalDeIngresos)*100 , 2) PromedioPorHora FROM parte2 , totalpordia	
+WHERE DAY(STR_TO_DATE(FechaTransaccion, '%m/%d/%Y%H:%i'))='26'
+GROUP BY   HOUR(STR_TO_DATE(FechaTransaccion, '%m/%d/%Y%H:%i'))
+
+
+CREATE VIEW TotalPorDia AS
+SELECT SUM(TarifaMonto)TotalDeIngresos FROM parte2
+WHERE DAY(STR_TO_DATE(FechaTransaccion, '%m/%d/%Y%H:%i'))='26'
+
+
+⦁	¿Qué buses fueron los que más ingresos generaron?
+
+CREATE VIEW parte26 AS
+SELECT  bus, SUM(TarifaMonto) FROM parte2
+WHERE DAY(STR_TO_DATE(FechaTransaccion, '%m/%d/%Y%H:%i'))='26'
+GROUP BY Bus
+ORDER by SUM(TarifaMonto) DESC
+LIMIT 30
+
+
+⦁	¿Cuáles fueron los ingresos durante el día en intervalos de quince minutos?
+
+CREATE VIEW parte27 AS
+SELECT sec_to_time(time_to_sec(STR_TO_DATE(FechaTransaccion, '%m/%d/%Y%H:%i'))- time_to_sec(STR_TO_DATE(FechaTransaccion, '%m/%d/%Y%H:%i'))%(15*60)) as Intervalos , SUM(TarifaMonto) IngresosEntre15Minutis
+FROM parte2
+WHERE DAY(STR_TO_DATE(FechaTransaccion, '%m/%d/%Y%H:%i'))='26'
+group by Intervalos
